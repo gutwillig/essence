@@ -466,6 +466,43 @@
     margin: 1rem 0;
   }
 
+  /* ── DISAMBIGUATION ── */
+  .disambig-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: fadeUp 0.4s ease;
+  }
+  .disambig-option {
+    display: flex;
+    align-items: center;
+    background: var(--paper);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1.25rem;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .disambig-option:hover {
+    background: var(--paper-2);
+    border-color: var(--gold);
+    transform: translateX(2px);
+  }
+  .disambig-label {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-right: 8px;
+  }
+  .disambig-hint {
+    font-size: 0.8rem;
+    color: var(--ink-4);
+    font-weight: 300;
+  }
+
   /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--paper); }
@@ -514,8 +551,9 @@
       </div>
     </div>
 
-    <div id="depth-selector" style="margin-top: 1.5rem; display: none;">
+    <div id="depth-selector" style="margin-top: 1.5rem;">
       <div class="depth-row">
+        <button class="depth-tab" data-depth="tldr" onclick="selectDepth(this)">TLDR</button>
         <button class="depth-tab active" data-depth="eli5" onclick="selectDepth(this)">ELI5</button>
         <button class="depth-tab" data-depth="1min" onclick="selectDepth(this)">1 min</button>
         <button class="depth-tab" data-depth="5min" onclick="selectDepth(this)">5 min</button>
@@ -540,10 +578,19 @@
   let isLoading = false;
 
   const depthLabels = {
+    tldr: 'TLDR',
     eli5: 'ELI5',
     '1min': '1-minute read',
     '5min': '5-minute deep read',
     deep: 'Full deep dive'
+  };
+
+  const depthTokens = {
+    tldr: 500,
+    eli5: 700,
+    '1min': 900,
+    '5min': 1400,
+    deep: 2800
   };
 
   function selectDepth(btn) {
@@ -584,7 +631,6 @@
     const hero = document.getElementById('hero');
     hero.classList.add('has-result');
     document.getElementById('suggestions').style.display = 'none';
-    document.getElementById('depth-selector').style.display = 'block';
     document.getElementById('search-btn').disabled = true;
     document.getElementById('search-btn').innerHTML = `
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="animation:spin 0.8s linear infinite">
@@ -594,16 +640,27 @@
     showLoading();
 
     const depthInstructions = {
+      tldr: `Two sentences maximum. The absolute irreducible core: what it is and the single most important thing to know. No context, no fluff — just the sharpest possible takeaway.`,
       eli5: `Explain it like I'm 5 years old. One short paragraph (3-4 sentences). Super simple language, no jargon. Make a child understand the core idea.`,
       '1min': `Give a 1-minute read. Two short paragraphs. Conversational tone. Capture the core idea, why it matters, and one interesting angle.`,
       '5min': `Give a thorough 5-minute read. Three to four paragraphs. Cover the core idea, context, why it matters, and nuance. Educated general audience.`,
-      deep: `Full deep dive. Four to six rich paragraphs. Cover the full idea, historical/cultural context, key debates, lasting influence, and nuanced perspectives. Engaging prose, not bullet points.`
+      deep: `Full deep dive. Six to eight rich, dense paragraphs of substantial prose. Cover everything: origins and historical context, the complete core idea, all major debates and criticisms, cultural and intellectual impact, surprising lesser-known angles, counterarguments, and lasting legacy. Assume an intelligent reader who wants the full picture — leave nothing important on the table. Engaging prose, not bullet points.`
     };
 
     const systemPrompt = `You are Essence — a brilliant knowledge distiller. Your job is to take any topic and extract its irreducible core with clarity, elegance, and insight. You respond ONLY in valid JSON — no markdown, no backticks, no preamble.
 
-Return this exact structure:
+FIRST — check if the query is genuinely ambiguous: does it have multiple well-known, meaningfully distinct interpretations? (Examples: "Monarch" → royalty vs. butterfly; "Gone with the Wind" → novel vs. film; "Mercury" → planet vs. element vs. Roman god vs. band; "The Office" → US vs. UK version). If so, return ONLY:
 {
+  "type": "disambiguation",
+  "prompt": "Short clarifying question, e.g. 'Which Monarch did you mean?'",
+  "alternatives": [
+    { "label": "Specific display name", "hint": "One-phrase clarification", "type": "film|book|concept|person|event" }
+  ]
+}
+
+If not ambiguous, return:
+{
+  "type": "result",
   "title": "Clean display title",
   "meta": "Brief category descriptor e.g. 'Film · 1994 · Frank Darabont' or 'Philosophy · Ancient Greece' or 'Physics · Quantum Theory'",
   "essence": "The main distilled explanation based on depth level",
@@ -627,7 +684,7 @@ Instruction: ${depthInstructions[currentDepth]}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
+          max_tokens: depthTokens[currentDepth] || 1000,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
         })
@@ -646,7 +703,11 @@ Instruction: ${depthInstructions[currentDepth]}`;
         throw new Error('Could not parse response. Please try again.');
       }
 
-      renderResult(parsed);
+      if (parsed.type === 'disambiguation') {
+        renderDisambiguation(parsed);
+      } else {
+        renderResult(parsed);
+      }
 
     } catch (err) {
       document.getElementById('result-content').innerHTML = `
@@ -672,6 +733,28 @@ Instruction: ${depthInstructions[currentDepth]}`;
     person: '#378ADD',
     event: '#BA7517'
   };
+
+  function renderDisambiguation(d) {
+    const alts = (d.alternatives || []).map(a => {
+      const color = connColors[a.type] || '#888780';
+      return `<button class="disambig-option" onclick="searchFor('${a.label.replace(/'/g,"\\'")}')">
+        <span class="conn-dot" style="background:${color}; flex-shrink:0;"></span>
+        <span class="disambig-label">${a.label}</span>
+        <span class="disambig-hint">— ${a.hint}</span>
+      </button>`;
+    }).join('');
+
+    document.getElementById('result-content').innerHTML = `
+      <div class="result-fade">
+        <div class="result-header">
+          <div class="result-title" style="font-size:1.5rem;">${d.prompt || 'Which did you mean?'}</div>
+        </div>
+        <div class="result-divider"></div>
+        <div class="disambig-list">${alts}</div>
+      </div>
+    `;
+    document.getElementById('result-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   function renderResult(d) {
     const connections = (d.connections || []).map(c => {
