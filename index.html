@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Essence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1814;
+    --ink-2: #3d3a33;
+    --ink-3: #6b6760;
+    --ink-4: #9e9b95;
+    --paper: #f5f2eb;
+    --paper-2: #ece9e0;
+    --paper-3: #e0dcd1;
+    --gold: #b8964e;
+    --gold-light: #d4af6e;
+    --border: rgba(26,24,20,0.1);
+    --border-strong: rgba(26,24,20,0.2);
+    --radius: 4px;
+    --radius-lg: 8px;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 0.5px solid var(--border-strong);
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .nav-right {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .nav-link {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--ink); }
+
+  /* ── HERO ── */
+  .hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem 3rem;
+    text-align: center;
+    transition: all 0.5s ease;
+  }
+  .hero.has-result {
+    padding: 2.5rem 2rem 1.5rem;
+    justify-content: flex-start;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.1s ease forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s ease forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--ink-2);
+  }
+
+  .hero-sub {
+    font-size: 0.95rem;
+    color: var(--ink-3);
+    font-weight: 300;
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.3s ease forwards;
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    width: 100%;
+    max-width: 560px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s ease forwards;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--paper);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(26,24,20,0.06);
+  }
+  .search-box:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,150,78,0.12), 0 2px 8px rgba(26,24,20,0.06);
+  }
+
+  .search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--ink);
+    padding: 1rem 1.25rem;
+    outline: none;
+  }
+  .search-box input::placeholder { color: var(--ink-4); }
+
+  .search-btn {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 0.875rem 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search-btn:hover { background: var(--ink-2); }
+  .search-btn:disabled { background: var(--ink-3); cursor: not-allowed; }
+
+  .suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.25rem;
+  }
+  .suggestion {
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    background: var(--paper-2);
+    border: 0.5px solid var(--border);
+    border-radius: 99px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .suggestion:hover {
+    background: var(--paper-3);
+    color: var(--ink);
+    border-color: var(--border-strong);
+  }
+
+  /* ── DEPTH TABS ── */
+  .depth-row {
+    display: flex;
+    gap: 0;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+    width: fit-content;
+    margin: 0 auto 1.5rem;
+  }
+  .depth-tab {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    background: var(--paper);
+    border: none;
+    border-right: 0.5px solid var(--border-strong);
+    color: var(--ink-4);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .depth-tab:last-child { border-right: none; }
+  .depth-tab:hover { background: var(--paper-2); color: var(--ink-2); }
+  .depth-tab.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ── RESULT AREA ── */
+  #result-area {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: none;
+  }
+  #result-area.visible { display: block; }
+
+  .result-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .result-meta {
+    font-size: 0.8rem;
+    color: var(--ink-4);
+    letter-spacing: 0.05em;
+  }
+
+  .result-divider {
+    height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    margin: 0.75rem 0 1.75rem;
+    opacity: 0.6;
+  }
+
+  /* ── ESSENCE BOX ── */
+  .essence-block {
+    background: var(--paper-2);
+    border: 0.5px solid var(--border-strong);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.4s ease;
+  }
+  .essence-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+  .essence-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  /* ── CARDS GRID ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.4s 0.1s ease both;
+  }
+  .info-card {
+    background: var(--paper);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.125rem;
+  }
+  .info-card-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 0.5rem;
+  }
+  .info-card-text {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  /* ── CONNECTIONS ── */
+  .connections-section {
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.4s 0.2s ease both;
+  }
+  .connections-label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 0.875rem;
+  }
+  .connections-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .connection-tag {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--ink-2);
+    background: var(--paper);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .connection-tag:hover {
+    background: var(--paper-3);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+  .conn-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── LOADING ── */
+  .loading-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    animation: fadeUp 0.3s ease;
+  }
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--paper-3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  .loading-text {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+  .loading-sub {
+    font-size: 0.75rem;
+    color: var(--ink-4);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  /* ── ERROR ── */
+  .error-box {
+    background: #fdf2f2;
+    border: 0.5px solid #e5b4b4;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    font-size: 0.875rem;
+    color: #7a3a3a;
+    line-height: 1.6;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 0.5px solid var(--border);
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-text {
+    font-size: 0.75rem;
+    color: var(--ink-4);
+    letter-spacing: 0.05em;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    color: var(--ink-3);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── RESULT FADE ── */
+  .result-fade {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* ── QUOTE STYLE ── */
+  blockquote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink-2);
+    border-left: 2px solid var(--gold);
+    padding-left: 1.25rem;
+    margin: 1rem 0;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--paper); }
+  ::-webkit-scrollbar-thumb { background: var(--paper-3); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    Essence
+  </div>
+  <div class="nav-right">
+    <span class="nav-link">Films</span>
+    <span class="nav-link">Books</span>
+    <span class="nav-link">Concepts</span>
+    <span class="nav-link">People</span>
+    <span class="nav-link">Events</span>
+  </div>
+</nav>
+
+<main>
+  <div class="hero" id="hero">
+    <div class="hero-eyebrow">The clarity layer for everything</div>
+    <h1 class="hero-title">What's the point<br>of <em>anything?</em></h1>
+    <p class="hero-sub">Films, books, ideas, events, people — distilled to their irreducible core. No fluff. Just essence.</p>
+
+    <div class="search-wrap">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Try a film, book, idea, person, concept…" autocomplete="off" />
+        <button class="search-btn" id="search-btn" onclick="getEssence()">
+          Distil
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="suggestions" id="suggestions">
+        <span class="suggestion" onclick="searchFor('Stoicism')">Stoicism</span>
+        <span class="suggestion" onclick="searchFor('The Great Gatsby')">The Great Gatsby</span>
+        <span class="suggestion" onclick="searchFor('The Cold War')">The Cold War</span>
+        <span class="suggestion" onclick="searchFor('Nikola Tesla')">Nikola Tesla</span>
+        <span class="suggestion" onclick="searchFor('Quantum Mechanics')">Quantum Mechanics</span>
+        <span class="suggestion" onclick="searchFor('The Dark Knight')">The Dark Knight</span>
+      </div>
+    </div>
+
+    <div id="depth-selector" style="margin-top: 1.5rem; display: none;">
+      <div class="depth-row">
+        <button class="depth-tab active" data-depth="eli5" onclick="selectDepth(this)">ELI5</button>
+        <button class="depth-tab" data-depth="1min" onclick="selectDepth(this)">1 min</button>
+        <button class="depth-tab" data-depth="5min" onclick="selectDepth(this)">5 min</button>
+        <button class="depth-tab" data-depth="deep" onclick="selectDepth(this)">Deep dive</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-area">
+    <div id="result-content"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-text">Powered by Claude · For demonstration purposes</div>
+  <div class="footer-logo">Essence</div>
+</footer>
+
+<script>
+  let currentDepth = 'eli5';
+  let currentQuery = '';
+  let isLoading = false;
+
+  const depthLabels = {
+    eli5: 'ELI5',
+    '1min': '1-minute read',
+    '5min': '5-minute deep read',
+    deep: 'Full deep dive'
+  };
+
+  function selectDepth(btn) {
+    document.querySelectorAll('.depth-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    currentDepth = btn.dataset.depth;
+    if (currentQuery) getEssence(true);
+  }
+
+  function searchFor(term) {
+    document.getElementById('search-input').value = term;
+    getEssence();
+  }
+
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') getEssence();
+  });
+
+  function showLoading() {
+    const area = document.getElementById('result-area');
+    area.classList.add('visible');
+    document.getElementById('result-content').innerHTML = `
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Distilling the essence</div>
+        <div class="loading-sub">Finding what truly matters…</div>
+      </div>
+    `;
+  }
+
+  async function getEssence(depthChange = false) {
+    const query = document.getElementById('search-input').value.trim();
+    if (!query || isLoading) return;
+
+    currentQuery = query;
+    isLoading = true;
+
+    const hero = document.getElementById('hero');
+    hero.classList.add('has-result');
+    document.getElementById('suggestions').style.display = 'none';
+    document.getElementById('depth-selector').style.display = 'block';
+    document.getElementById('search-btn').disabled = true;
+    document.getElementById('search-btn').innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="animation:spin 0.8s linear infinite">
+        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="5"/>
+      </svg>`;
+
+    showLoading();
+
+    const depthInstructions = {
+      eli5: `Explain it like I'm 5 years old. One short paragraph (3-4 sentences). Super simple language, no jargon. Make a child understand the core idea.`,
+      '1min': `Give a 1-minute read. Two short paragraphs. Conversational tone. Capture the core idea, why it matters, and one interesting angle.`,
+      '5min': `Give a thorough 5-minute read. Three to four paragraphs. Cover the core idea, context, why it matters, and nuance. Educated general audience.`,
+      deep: `Full deep dive. Four to six rich paragraphs. Cover the full idea, historical/cultural context, key debates, lasting influence, and nuanced perspectives. Engaging prose, not bullet points.`
+    };
+
+    const systemPrompt = `You are Essence — a brilliant knowledge distiller. Your job is to take any topic and extract its irreducible core with clarity, elegance, and insight. You respond ONLY in valid JSON — no markdown, no backticks, no preamble.
+
+Return this exact structure:
+{
+  "title": "Clean display title",
+  "meta": "Brief category descriptor e.g. 'Film · 1994 · Frank Darabont' or 'Philosophy · Ancient Greece' or 'Physics · Quantum Theory'",
+  "essence": "The main distilled explanation based on depth level",
+  "the_point": "One sentence: what's the deeper point or why does this matter?",
+  "why_it_matters": "One sentence: real-world relevance or lasting impact",
+  "the_debate": "One sentence: the most interesting tension, controversy, or open question",
+  "connections": [
+    {"label": "Connection name", "type": "film|book|concept|person|event", "why": "One phrase: how it connects"}
+  ]
+}
+
+connections should have 4-6 items — other works, ideas, or figures that share the same essential idea.`;
+
+    const userPrompt = `Topic: "${query}"
+Depth: ${depthLabels[currentDepth]}
+Instruction: ${depthInstructions[currentDepth]}`;
+
+    try {
+      const response = await fetch('/api/essence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error?.message || 'API error');
+
+      const raw = data.content[0]?.text || '';
+      let parsed;
+      try {
+        const clean = raw.replace(/```json|```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch {
+        throw new Error('Could not parse response. Please try again.');
+      }
+
+      renderResult(parsed);
+
+    } catch (err) {
+      document.getElementById('result-content').innerHTML = `
+        <div class="error-box">
+          <strong>Something went wrong.</strong><br>
+          ${err.message || 'Please try again in a moment.'}
+        </div>
+      `;
+    } finally {
+      isLoading = false;
+      document.getElementById('search-btn').disabled = false;
+      document.getElementById('search-btn').innerHTML = `Distil
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+    }
+  }
+
+  const connColors = {
+    film: '#7F77DD',
+    book: '#1D9E75',
+    concept: '#D85A30',
+    person: '#378ADD',
+    event: '#BA7517'
+  };
+
+  function renderResult(d) {
+    const connections = (d.connections || []).map(c => {
+      const color = connColors[c.type] || '#888780';
+      return `<span class="connection-tag" onclick="searchFor('${c.label.replace(/'/g,"\\'")}')">
+        <span class="conn-dot" style="background:${color}"></span>
+        ${c.label}
+        <span style="color:var(--ink-4); font-size:0.72rem;">— ${c.why}</span>
+      </span>`;
+    }).join('');
+
+    document.getElementById('result-content').innerHTML = `
+      <div class="result-fade">
+        <div class="result-header">
+          <div class="result-title">${d.title || currentQuery}</div>
+          <div class="result-meta">${d.meta || ''}</div>
+        </div>
+        <div class="result-divider"></div>
+
+        <div class="essence-block">
+          <div class="essence-eyebrow">The essence · ${depthLabels[currentDepth]}</div>
+          <div class="essence-text">${d.essence || ''}</div>
+        </div>
+
+        <div class="cards-grid">
+          <div class="info-card">
+            <div class="info-card-label">The point</div>
+            <div class="info-card-text">${d.the_point || ''}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Why it matters</div>
+            <div class="info-card-text">${d.why_it_matters || ''}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">The debate</div>
+            <div class="info-card-text">${d.the_debate || ''}</div>
+          </div>
+        </div>
+
+        <div class="connections-section">
+          <div class="connections-label">This idea echoes in</div>
+          <div class="connections-list">${connections}</div>
+        </div>
+      </div>
+    `;
+    document.getElementById('result-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+</body>
+</html>
