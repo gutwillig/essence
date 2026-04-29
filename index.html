@@ -244,6 +244,11 @@
     transition: all 0.15s;
   }
   .depth-tab:last-child { border-right: none; }
+  .depth-tab-simple-group {
+    display: flex;
+    background: var(--paper-2);
+    border-right: 0.5px solid var(--border-strong);
+  }
   .depth-tab:hover { background: var(--paper-2); color: var(--ink-2); }
   .depth-tab.active {
     background: var(--ink);
@@ -597,7 +602,7 @@
   <div class="hero" id="hero">
     <div class="hero-eyebrow">The clarity layer for everything</div>
     <h1 class="hero-title">What's the point<br>of <em>anything?</em></h1>
-    <p class="hero-sub">Films, books, ideas, events, people — distilled to their irreducible core. No fluff. Just essence.</p>
+    <p class="hero-sub">Films, books, ideas, events, people — distilled to their irreducible core. find the essence</p>
 
     <div class="search-wrap">
       <div class="search-box">
@@ -621,8 +626,10 @@
 
     <div id="depth-selector" style="margin-top: 1.5rem;">
       <div class="depth-row">
-        <button class="depth-tab" data-depth="tldr" onclick="selectDepth(this)">TLDR</button>
-        <button class="depth-tab active" data-depth="eli5" onclick="selectDepth(this)">ELI5</button>
+        <div class="depth-tab-simple-group">
+          <button class="depth-tab active" data-depth="tldr" onclick="selectDepth(this)">TLDR</button>
+          <button class="depth-tab" data-depth="eli5" onclick="selectDepth(this)">ELI5</button>
+        </div>
         <button class="depth-tab" data-depth="1min" onclick="selectDepth(this)">1 min</button>
         <button class="depth-tab" data-depth="5min" onclick="selectDepth(this)">5 min</button>
         <button class="depth-tab" data-depth="deep" onclick="selectDepth(this)">Deep dive</button>
