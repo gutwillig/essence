@@ -466,6 +466,74 @@
     margin: 1rem 0;
   }
 
+  /* ── CATEGORY VIEW ── */
+  .category-view {
+    display: none;
+    padding: 2.5rem 2rem 4rem;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeUp 0.35s ease;
+  }
+  .category-view.visible { display: block; }
+
+  .category-back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-4);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.15s;
+    margin-bottom: 1.25rem;
+  }
+  .category-back:hover { color: var(--ink); }
+
+  .category-view-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.25rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .category-view-sub {
+    font-size: 0.8rem;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px;
+  }
+  .category-item {
+    background: var(--paper);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    font-weight: 300;
+    font-family: 'DM Sans', sans-serif;
+    text-align: left;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .category-item:hover {
+    background: var(--paper-2);
+    border-color: var(--gold);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+
   /* ── DISAMBIGUATION ── */
   .disambig-list {
     display: flex;
@@ -512,16 +580,16 @@
 <body>
 
 <nav>
-  <div class="logo">
+  <div class="logo" onclick="goHome()" style="cursor:pointer;">
     <span class="logo-dot"></span>
     Essence
   </div>
   <div class="nav-right">
-    <span class="nav-link">Films</span>
-    <span class="nav-link">Books</span>
-    <span class="nav-link">Concepts</span>
-    <span class="nav-link">People</span>
-    <span class="nav-link">Events</span>
+    <span class="nav-link" onclick="showCategory('films')">Films</span>
+    <span class="nav-link" onclick="showCategory('books')">Books</span>
+    <span class="nav-link" onclick="showCategory('concepts')">Concepts</span>
+    <span class="nav-link" onclick="showCategory('people')">People</span>
+    <span class="nav-link" onclick="showCategory('events')">Events</span>
   </div>
 </nav>
 
@@ -562,6 +630,8 @@
     </div>
   </div>
 
+  <div id="category-view" class="category-view"></div>
+
   <div id="result-area">
     <div id="result-content"></div>
   </div>
@@ -573,6 +643,71 @@
 </footer>
 
 <script>
+  const categoryData = {
+    films: {
+      label: 'Films',
+      sub: '25 essential films',
+      items: ['The Godfather','Pulp Fiction','Schindler\'s List','2001: A Space Odyssey','The Dark Knight','Parasite','Fight Club','Inception','Blade Runner','Spirited Away','Eternal Sunshine of the Spotless Mind','No Country for Old Men','Apocalypse Now','The Silence of the Lambs','Citizen Kane','Taxi Driver','There Will Be Blood','The Shawshank Redemption','Mulholland Drive','Rear Window','City of God','Amélie','Pan\'s Labyrinth','In the Mood for Love','Stalker']
+    },
+    books: {
+      label: 'Books',
+      sub: '25 essential books',
+      items: ['1984','Crime and Punishment','The Great Gatsby','To Kill a Mockingbird','One Hundred Years of Solitude','Moby-Dick','The Brothers Karamazov','Dune','Beloved','The Trial','Blood Meridian','Catch-22','Middlemarch','Anna Karenina','Infinite Jest','Don Quixote','The Master and Margarita','Lolita','The Road','A Brief History of Time','Sapiens','The Stranger','Things Fall Apart','The Remains of the Day','Giovanni\'s Room']
+    },
+    concepts: {
+      label: 'Concepts',
+      sub: '25 essential concepts',
+      items: ['Stoicism','Existentialism','Quantum Mechanics','Evolution','The Trolley Problem','Cognitive Dissonance','String Theory','The Butterfly Effect','Nihilism','Entropy','The Prisoner\'s Dilemma','The Fermi Paradox','The Social Contract','Zen Buddhism','Determinism','The Allegory of the Cave','Utilitarianism','Natural Selection','The Overton Window','Sunk Cost Fallacy','Chaos Theory','Emergence','Moral Relativism','The Dunning-Kruger Effect','Solipsism']
+    },
+    people: {
+      label: 'People',
+      sub: '25 essential figures',
+      items: ['Albert Einstein','Leonardo da Vinci','Nikola Tesla','Marie Curie','Friedrich Nietzsche','Sigmund Freud','Karl Marx','Alan Turing','Simone de Beauvoir','James Baldwin','Frida Kahlo','Ada Lovelace','Marcus Aurelius','Hannah Arendt','Virginia Woolf','Galileo Galilei','Cleopatra','Genghis Khan','Charles Darwin','Isaac Newton','Joan of Arc','Mary Shelley','Immanuel Kant','Malcolm X','Socrates']
+    },
+    events: {
+      label: 'Events',
+      sub: '25 essential events',
+      items: ['World War II','The French Revolution','The Moon Landing','The Cold War','The Black Death','The Renaissance','The Industrial Revolution','The Fall of Rome','The Holocaust','The American Civil War','The Cuban Missile Crisis','The Manhattan Project','The Protestant Reformation','The Enlightenment','The Space Race','The Great Depression','D-Day','The Arab Spring','The Rwandan Genocide','The Silk Road','The Battle of Thermopylae','Chernobyl','The Age of Exploration','The Boston Tea Party','The Treaty of Westphalia']
+    }
+  };
+
+  function showCategory(name) {
+    const data = categoryData[name];
+    if (!data) return;
+    document.getElementById('hero').style.display = 'none';
+    document.getElementById('result-area').classList.remove('visible');
+    const view = document.getElementById('category-view');
+    view.innerHTML = `
+      <button class="category-back" onclick="goHome()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <div class="category-view-title">${data.label}</div>
+      <div class="result-divider"></div>
+      <div class="category-view-sub">${data.sub}</div>
+      <div class="category-grid">
+        ${data.items.map(item => `<button class="category-item" onclick="searchFromCategory('${item.replace(/'/g, "\\'")}')">${item}</button>`).join('')}
+      </div>
+    `;
+    view.classList.add('visible');
+  }
+
+  function goHome() {
+    document.getElementById('category-view').classList.remove('visible');
+    document.getElementById('result-area').classList.remove('visible');
+    const hero = document.getElementById('hero');
+    hero.style.display = '';
+    hero.classList.remove('has-result');
+    document.getElementById('search-input').value = '';
+    document.getElementById('suggestions').style.display = '';
+    currentQuery = '';
+  }
+
+  function searchFromCategory(term) {
+    goHome();
+    setTimeout(() => searchFor(term), 50);
+  }
+
   let currentDepth = 'eli5';
   let currentQuery = '';
   let isLoading = false;
