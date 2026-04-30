@@ -101,17 +101,6 @@
     justify-content: flex-start;
   }
 
-  .hero-eyebrow {
-    font-size: 0.72rem;
-    font-weight: 400;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1.25rem;
-    opacity: 0;
-    animation: fadeUp 0.6s 0.1s ease forwards;
-  }
-
   .hero-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(2.8rem, 6vw, 4.5rem);
@@ -125,17 +114,6 @@
   .hero-title em {
     font-style: italic;
     color: var(--ink-2);
-  }
-
-  .hero-sub {
-    font-size: 0.95rem;
-    color: var(--ink-3);
-    font-weight: 300;
-    max-width: 420px;
-    line-height: 1.7;
-    margin-bottom: 3rem;
-    opacity: 0;
-    animation: fadeUp 0.6s 0.3s ease forwards;
   }
 
   /* ── SEARCH ── */
@@ -244,11 +222,6 @@
     transition: all 0.15s;
   }
   .depth-tab:last-child { border-right: none; }
-  .depth-tab-simple-group {
-    display: flex;
-    background: var(--paper-2);
-    border-right: 0.5px solid var(--border-strong);
-  }
   .depth-tab:hover { background: var(--paper-2); color: var(--ink-2); }
   .depth-tab.active {
     background: var(--ink);
@@ -715,6 +688,7 @@
   }
 
   function goHome() {
+    isLoading = false;
     document.getElementById('category-view').classList.remove('visible');
     document.getElementById('result-area').classList.remove('visible');
     const hero = document.getElementById('hero');
@@ -722,6 +696,11 @@
     hero.classList.remove('has-result');
     document.getElementById('search-input').value = '';
     document.getElementById('suggestions').style.display = '';
+    document.getElementById('search-btn').disabled = false;
+    document.getElementById('search-btn').innerHTML = `Distil
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
     currentQuery = '';
   }
 
@@ -832,18 +811,23 @@ connections should have 4-6 items — other works, ideas, or figures that share 
 Depth: ${depthLabels[currentDepth]}
 Instruction: ${depthInstructions[currentDepth]}`;
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
+
     try {
       const response = await fetch('/api/essence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: depthTokens[currentDepth] || 1000,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
-        })
+        }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeout);
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error?.message || 'API error');
@@ -864,10 +848,13 @@ Instruction: ${depthInstructions[currentDepth]}`;
       }
 
     } catch (err) {
+      clearTimeout(timeout);
+      const msg = err.name === 'AbortError'
+        ? 'Request timed out — try a shorter depth or try again.'
+        : (err.message || 'Please try again in a moment.');
       document.getElementById('result-content').innerHTML = `
         <div class="error-box">
-          <strong>Something went wrong.</strong><br>
-          ${err.message || 'Please try again in a moment.'}
+          <strong>Something went wrong.</strong><br>${msg}
         </div>
       `;
     } finally {
