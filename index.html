@@ -210,9 +210,9 @@
   .search-btn:disabled { background: var(--ink-3); cursor: not-allowed; }
 
   .suggestions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, max-content);
     gap: 8px;
-    flex-wrap: wrap;
     justify-content: center;
     margin-top: 1.25rem;
   }
@@ -650,12 +650,16 @@
         </button>
       </div>
       <div class="suggestions" id="suggestions">
-        <span class="suggestion" onclick="searchFor('Stoicism')">Stoicism</span>
-        <span class="suggestion" onclick="searchFor('The Great Gatsby')">The Great Gatsby</span>
-        <span class="suggestion" onclick="searchFor('The Sopranos')">The Sopranos</span>
-        <span class="suggestion" onclick="searchFor('Nikola Tesla')">Nikola Tesla</span>
-        <span class="suggestion" onclick="searchFor('Bitcoin')">Bitcoin</span>
+        <span class="suggestion" onclick="searchFor('Inception')">Inception</span>
         <span class="suggestion" onclick="searchFor('Dune')">Dune</span>
+        <span class="suggestion" onclick="searchFor('Stoicism')">Stoicism</span>
+        <span class="suggestion" onclick="searchFor('Einstein')">Einstein</span>
+        <span class="suggestion" onclick="searchFor('Chernobyl')">Chernobyl</span>
+        <span class="suggestion" onclick="searchFor('Parasite')">Parasite</span>
+        <span class="suggestion" onclick="searchFor('1984')">1984</span>
+        <span class="suggestion" onclick="searchFor('Evolution')">Evolution</span>
+        <span class="suggestion" onclick="searchFor('Cleopatra')">Cleopatra</span>
+        <span class="suggestion" onclick="searchFor('D-Day')">D-Day</span>
       </div>
     </div>
 
