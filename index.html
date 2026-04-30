@@ -53,16 +53,16 @@
 
   .logo {
     font-family: 'Playfair Display', serif;
-    font-size: 1.35rem;
-    font-weight: 400;
-    letter-spacing: 0.04em;
+    font-size: 1.65rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     color: var(--ink);
     display: flex;
     align-items: center;
     gap: 8px;
   }
   .logo-dot {
-    width: 6px; height: 6px;
+    width: 7px; height: 7px;
     background: var(--gold);
     border-radius: 50%;
     display: inline-block;
@@ -92,7 +92,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 5rem 2rem 3rem;
+    padding: 2.5rem 2rem 2.5rem;
     text-align: center;
     transition: all 0.5s ease;
   }
@@ -539,33 +539,28 @@
     transform: translateY(-1px);
   }
 
-  /* ── ELI5 FOLLOW-UP ── */
-  .eli5-prompt {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 0.5px solid var(--border);
-    animation: fadeUp 0.4s 0.4s ease both;
-  }
-  .eli5-prompt span {
-    font-size: 0.82rem;
-    color: var(--ink-4);
-    font-style: italic;
-  }
-  .eli5-prompt-btn {
-    background: none;
-    border: none;
+  /* ── ELI5 INLINE ── */
+  .eli5-inline-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 1.1rem;
+    background: var(--paper-3);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 99px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.82rem;
-    color: var(--gold);
+    font-weight: 400;
+    color: var(--ink-2);
     cursor: pointer;
-    padding: 0;
-    margin-left: 6px;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.15s;
+    transition: all 0.15s;
   }
-  .eli5-prompt-btn:hover { color: var(--gold-light); }
+  .eli5-inline-btn:hover {
+    background: var(--paper);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
 
   /* ── DISAMBIGUATION ── */
   .disambig-list {
@@ -628,8 +623,7 @@
 
 <main>
   <div class="hero" id="hero">
-    <div class="hero-eyebrow">The clarity layer for everything</div>
-    <h1 class="hero-title">What's the point<br>of <em>anything?</em></h1>
+    <h1 class="hero-title">Essence —<br>What's the point<br>of <em>anything?</em></h1>
     <div class="search-wrap">
       <div class="search-box">
         <input type="text" id="search-input" placeholder="Try a film, book, idea, person, concept…" autocomplete="off" />
@@ -943,6 +937,7 @@ Instruction: ${depthInstructions[currentDepth]}`;
         <div class="essence-block">
           <div class="essence-eyebrow">The essence · ${depthLabels[currentDepth]}</div>
           <div class="essence-text">${d.essence || ''}</div>
+          ${currentDepth === 'tldr' ? `<button class="eli5-inline-btn" onclick="tryELI5()">🤔 Still lost? ELI5 it</button>` : ''}
         </div>
 
         <div class="cards-grid">
@@ -965,11 +960,6 @@ Instruction: ${depthInstructions[currentDepth]}`;
           <div class="connections-list">${connections}</div>
         </div>
 
-        ${currentDepth === 'tldr' ? `
-        <div class="eli5-prompt">
-          <span>Still confused?</span>
-          <button class="eli5-prompt-btn" onclick="tryELI5()">Try ELI5 →</button>
-        </div>` : ''}
       </div>
     `;
     document.getElementById('result-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
