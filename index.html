@@ -649,12 +649,7 @@
           </svg>
         </button>
       </div>
-      <div class="suggestions" id="suggestions">
-        <span class="suggestion" onclick="searchFor('The Great Gatsby')">The Great Gatsby</span>
-        <span class="suggestion" onclick="searchFor('The Sopranos')">The Sopranos</span>
-        <span class="suggestion" onclick="searchFor('Stoicism')">Stoicism</span>
-        <span class="suggestion" onclick="searchFor('Consciousness')">Consciousness</span>
-      </div>
+      <div class="suggestions" id="suggestions"></div>
     </div>
 
     <div id="depth-selector" style="margin-top: 1.5rem;">
@@ -1006,6 +1001,23 @@ Instruction: ${depthInstructions[currentDepth]}`;
     `;
     document.getElementById('result-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+  const suggestionPool = [
+    'The Godfather','Blade Runner','The Great Gatsby','The Sopranos',
+    'Stoicism','Consciousness','Nietzsche','Cleopatra','The Cold War',
+    'Moby-Dick','2001: A Space Odyssey','The Ego','The Trolley Problem',
+    'Crime and Punishment','Chernobyl','The Renaissance','Mulholland Drive',
+    '1984','The Fermi Paradox','Twin Peaks','Apocalypse Now','Kafka',
+    'The Odyssey','Freud','The French Revolution'
+  ];
+
+  (function seedSuggestions() {
+    const pool = [...suggestionPool].sort(() => Math.random() - 0.5).slice(0, 4);
+    const wrap = document.getElementById('suggestions');
+    wrap.innerHTML = pool.map(t =>
+      `<span class="suggestion" onclick="searchFor('${t.replace(/'/g, "\'")}')">${t}</span>`
+    ).join('');
+  })();
 </script>
 </body>
 </html>
