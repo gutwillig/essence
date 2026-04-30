@@ -539,6 +539,34 @@
     transform: translateY(-1px);
   }
 
+  /* ── ELI5 FOLLOW-UP ── */
+  .eli5-prompt {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid var(--border);
+    animation: fadeUp 0.4s 0.4s ease both;
+  }
+  .eli5-prompt span {
+    font-size: 0.82rem;
+    color: var(--ink-4);
+    font-style: italic;
+  }
+  .eli5-prompt-btn {
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--gold);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 6px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+  }
+  .eli5-prompt-btn:hover { color: var(--gold-light); }
+
   /* ── DISAMBIGUATION ── */
   .disambig-list {
     display: flex;
@@ -602,8 +630,6 @@
   <div class="hero" id="hero">
     <div class="hero-eyebrow">The clarity layer for everything</div>
     <h1 class="hero-title">What's the point<br>of <em>anything?</em></h1>
-    <p class="hero-sub">Films, books, ideas, events, people — distilled to their irreducible core. find the essence</p>
-
     <div class="search-wrap">
       <div class="search-box">
         <input type="text" id="search-input" placeholder="Try a film, book, idea, person, concept…" autocomplete="off" />
@@ -626,12 +652,8 @@
 
     <div id="depth-selector" style="margin-top: 1.5rem;">
       <div class="depth-row">
-        <div class="depth-tab-simple-group">
-          <button class="depth-tab active" data-depth="tldr" onclick="selectDepth(this)">TLDR</button>
-          <button class="depth-tab" data-depth="eli5" onclick="selectDepth(this)">ELI5</button>
-        </div>
-        <button class="depth-tab" data-depth="1min" onclick="selectDepth(this)">1 min</button>
-        <button class="depth-tab" data-depth="5min" onclick="selectDepth(this)">5 min</button>
+        <button class="depth-tab active" data-depth="tldr" onclick="selectDepth(this)">TLDR</button>
+        <button class="depth-tab" data-depth="3min" onclick="selectDepth(this)">3 min</button>
         <button class="depth-tab" data-depth="deep" onclick="selectDepth(this)">Deep dive</button>
       </div>
     </div>
@@ -715,24 +737,22 @@
     setTimeout(() => searchFor(term), 50);
   }
 
-  let currentDepth = 'eli5';
+  let currentDepth = 'tldr';
   let currentQuery = '';
   let isLoading = false;
 
   const depthLabels = {
     tldr: 'TLDR',
     eli5: 'ELI5',
-    '1min': '1-minute read',
-    '5min': '5-minute deep read',
+    '3min': '3-minute read',
     deep: 'Full deep dive'
   };
 
   const depthTokens = {
     tldr: 500,
     eli5: 700,
-    '1min': 900,
-    '5min': 1400,
-    deep: 2800
+    '3min': 1400,
+    deep: 4500
   };
 
   function selectDepth(btn) {
@@ -784,9 +804,8 @@
     const depthInstructions = {
       tldr: `Two sentences maximum. The absolute irreducible core: what it is and the single most important thing to know. No context, no fluff — just the sharpest possible takeaway.`,
       eli5: `Explain it like I'm 5 years old. One short paragraph (3-4 sentences). Super simple language, no jargon. Make a child understand the core idea.`,
-      '1min': `Give a 1-minute read. Two short paragraphs. Conversational tone. Capture the core idea, why it matters, and one interesting angle.`,
-      '5min': `Give a thorough 5-minute read. Three to four paragraphs. Cover the core idea, context, why it matters, and nuance. Educated general audience.`,
-      deep: `Full deep dive. Six to eight rich, dense paragraphs of substantial prose. Cover everything: origins and historical context, the complete core idea, all major debates and criticisms, cultural and intellectual impact, surprising lesser-known angles, counterarguments, and lasting legacy. Assume an intelligent reader who wants the full picture — leave nothing important on the table. Engaging prose, not bullet points.`
+      '3min': `Give a thorough 3-minute read. Three to four paragraphs. Cover the core idea, why it exists, why it matters, and one genuinely interesting angle. Educated general audience, conversational but intelligent tone.`,
+      deep: `Full deep dive. Eight to twelve rich, dense paragraphs of substantial prose. This must be meaningfully longer and more thorough than a 3-minute summary. Cover everything: origins and full historical context, the complete core idea with all its nuances, every major debate and criticism, cultural and intellectual impact across multiple domains, surprising lesser-known angles, the strongest counterarguments, and the lasting legacy. Leave nothing important out. Assume a highly intelligent reader who wants the complete picture. Engaging literary prose, not bullet points.`
     };
 
     const systemPrompt = `You are Essence — a brilliant knowledge distiller. Your job is to take any topic and extract its irreducible core with clarity, elegance, and insight. You respond ONLY in valid JSON — no markdown, no backticks, no preamble.
@@ -876,6 +895,11 @@ Instruction: ${depthInstructions[currentDepth]}`;
     event: '#BA7517'
   };
 
+  function tryELI5() {
+    currentDepth = 'eli5';
+    getEssence(true);
+  }
+
   function renderDisambiguation(d) {
     const alts = (d.alternatives || []).map(a => {
       const color = connColors[a.type] || '#888780';
@@ -940,6 +964,12 @@ Instruction: ${depthInstructions[currentDepth]}`;
           <div class="connections-label">This idea echoes in</div>
           <div class="connections-list">${connections}</div>
         </div>
+
+        ${currentDepth === 'tldr' ? `
+        <div class="eli5-prompt">
+          <span>Still confused?</span>
+          <button class="eli5-prompt-btn" onclick="tryELI5()">Try ELI5 →</button>
+        </div>` : ''}
       </div>
     `;
     document.getElementById('result-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
